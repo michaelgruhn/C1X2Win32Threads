@@ -1,0 +1,70 @@
+C1X2Win32Threads
+================
+
+C1X threads draft implementation as per
+WG14 N1425 Draft 2009-11-24 ISO/IEC 9899:201x
+http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1425.pdf
+Using Win32 API as backend
+
+Please note: This is a crude quick and dirty implementation of the threads.h
+of the above mentioned draft standard commonly know as C1X. It implements most
+of the functions (for a list of what is implemented and what isn't see below)
+using the Win32 API synchronization functions.
+The implementation was done to get a preliminary implementation of the upcoming
+(but still changing) standard to base new code upon. It neither claims to be
+complete nor perfect nor have good performance, but it should work.
+
+TODO:
+Fix warnings
+Clean up code
+
+Issues:
+Possibly unsafe behaviour in cnd_* functions
+xtime_get() returns a "random" time based on GetSystemTime()
+
+Functions implemented:
+int thrd_create(thrd_t *thr, thrd_start_t func, void *arg);
+int thrd_equal(thrd_t thr0, thrd_t thr1);
+void thrd_exit(int res);
+int thrd_join(thrd_t thr, int *res);
+void thrd_sleep(const xtime *xt);
+void thrd_yield(void);
+void mtx_destroy(mtx_t *mtx);
+int mtx_init(mtx_t *mtx, int type);
+int mtx_lock(mtx_t *mtx);
+int mtx_unlock(mtx_t *mtx);
+int mtx_timedlock(mtx_t *mtx, const xtime *xt);
+int mtx_trylock(mtx_t *mtx);
+thrd_t thrd_current(void);
+void call_once(once_flag *flag, void(*func)(void));
+int thrd_detach(thrd_t thr); [does nothing since you don't need to explictly detach threads in windows (?)]
+int cnd_broadcast(cnd_t *cond);
+void cnd_destroy(cnd_t *cond);
+int cnd_init(cnd_t *cond);
+int cnd_signal(cnd_t *cond);
+int cnd_wait(cnd_t *cond, mtx_t *mtx);
+int cnd_timedwait(cnd_t *cond, mtx_t *mtx, const xtime *xt);
+int xtime_get(xtime *xt, int base); [returns something .. though the draft docs don't make clear what exactly should be returned so this might be BS]
+
+Functions not implemented:
+int tss_create(tss_t *key, tss_dtor_t dtor); <=> TlsAlloc()
+void tss_delete(tss_t key); <=> TlsFree()
+void *tss_get(tss_t key); <=> TlsGetValue()
+int tss_set(tss_t key, void *val); <=> TlsSetValue()
+
+
+Copyright (c) 2010, Michael Gruhn <michael-gruhn@web.de>
+Some rights reserved.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+

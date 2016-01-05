@@ -1,0 +1,7 @@
+all: threads_test.exe
+
+threads_test.exe: threads_test.c threads.c threads.h
+	mingw32-gcc -o threads_test.exe threads_test.c threads.c \
+	-W -Wall -Wconversion -Wextra -std=c99 -pedantic \
+	-g
+
